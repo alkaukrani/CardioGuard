@@ -1,0 +1,52 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 200px;
+    background: #fff;
+    padding-bottom:30px;
+}
+
+.inputs {
+    margin-top: 55px;
+    display: flex;
+    flex-direction: column;
+    gap:25px;
+
+
+}
+
+
+.input {
+    display: flex;
+    align-items: center;
+    margin:auto;
+    width: 480px;
+    height: 80px;
+    background: #eaeaea;
+    border-radius: 6px;
+
+
+}
+
+.input imp{
+    margin: 0px 30px;
+
+}
+
+.input input {
+    height: 50px;
+    width:400px;
+    border: none;
+    outline:none;
+    font-size:19px;
+    
+
+
+
+}
+
+
+
+
+
