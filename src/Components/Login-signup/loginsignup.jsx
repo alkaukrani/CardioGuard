@@ -1,18 +1,9 @@
 import React from 'react';
 import './loginsignup.css';
-
 import user_icon from '../Assets/person.png';
 import email_icon from '../Assets/email.png';
 import password_icon from '../Assets/password.png';
-
-// Define the redirectToWhoop function
-function redirectToWhoop() {
-  const clientId = "2896680d-9cb4-4e75-bd93-9d715f5bd7b3"; // Replace with your actual Client ID
-  const redirectUri = "http://localhost:3001/"; // Redirect URI configured in WHOOP
-  const authUrl = `https://api.prod.whoop.com/oauth/oauth2/auth?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}`;
-  
-  window.location.href = authUrl; // Redirect user to WHOOP authorization page
-}
+import redirectToWhoop from '../whoopOauth/redirecttowhoop'; // Add this import
 
 export default function LoginSignup() {
   return (
@@ -45,4 +36,4 @@ export default function LoginSignup() {
       <button onClick={redirectToWhoop}>Connect to WHOOP</button>
     </div>
   );
-};
+}
