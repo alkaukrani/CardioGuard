@@ -1,23 +1,39 @@
 import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
+/**
+ * Callback component handles the OAuth callback from WHOOP
+ * Exchanges authorization code for access token and redirects to form
+ */
 function Callback() {
+  // Get URL parameters and navigation function from React Router
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  // Extract authorization code from URL parameters
   const authorizationCode = searchParams.get("code");
 
+  // Effect runs when component mounts or authorization code changes
   useEffect(() => {
     if (authorizationCode) {
-      console.log("Authorization Code:", authorizationCode);
       exchangeAuthorizationCode(authorizationCode);
     }
   }, [authorizationCode]);
 
+  /**
+   * Exchanges the authorization code for an access token
+   * @param {string} code - The authorization code from WHOOP
+   */
   async function exchangeAuthorizationCode(code) {
-    const tokenUrl = "https://api.prod.whoop.com/oauth/oauth2/token";
+    // WHOOP API endpoint (using proxy configured in package.json)
+    const tokenUrl = "/oauth/oauth2/token";
+    
+    // WHOOP OAuth credentials
     const clientId = "2896680d-9cb4-4e75-bd93-9d715f5bd7b3";
     const clientSecret = "19dc8306292013e1a40525d26a4aa9e02e80f4eae68a310dbe8ca4aea3cdbade";
     const redirectUri = "http://localhost:3000/auth/whoop/callback";
 
+    // Prepare request body parameters
     const body = new URLSearchParams();
     body.append("client_id", clientId);
     body.append("client_secret", clientSecret);
@@ -26,43 +42,35 @@ function Callback() {
     body.append("code", code);
 
     try {
+      // Make request to WHOOP API to exchange code for token
       const response = await fetch(tokenUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          "Accept": "application/json",
-          "Origin": "http://localhost:3000"
+          "Accept": "application/json"
         },
-        body: body,
-        mode: 'cors'
+        body: body
       });
 
-      const responseText = await response.text();
-      console.log("Full response:", responseText);
-
+      // Check if request was successful
       if (!response.ok) {
-        console.error("Response status:", response.status);
-        console.error("Response text:", responseText);
         throw new Error(`Failed to exchange authorization code: ${response.status}`);
       }
 
-      try {
-        const data = JSON.parse(responseText);
-        console.log("Access Token:", data.access_token);
-        if (data.access_token) {
-          // Successfully got the token
-          localStorage.setItem('whoop_access_token', data.access_token);
-          window.location.href = '/'; // or wherever you want to redirect
-        }
-      } catch (e) {
-        console.error("Error parsing JSON:", e);
-        throw new Error("Failed to parse response");
+      // Parse response data
+      const data = await response.json();
+      
+      // If we got an access token, save it and redirect to form
+      if (data.access_token) {
+        localStorage.setItem('whoop_access_token', data.access_token);
+        navigate('/form');
       }
     } catch (error) {
-      console.error("Error exchanging authorization code:", error);
+      console.error("Error exchanging authorization code");
     }
   }
 
+  // Loading screen while processing authorization
   return (
     <div style={{ 
       display: 'flex', 
