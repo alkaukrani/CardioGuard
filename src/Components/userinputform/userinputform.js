@@ -24,13 +24,14 @@ function UserInputForm() {
     whoopId: localStorage.getItem('whoop_access_token') // Add WHOOP token
   });
 
-  const mutation = useMutation((newUser) => 
-    axios.post("http://localhost:5001/api/users", newUser, {  // Changed port to 5001
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-  );
+  const mutation = useMutation({
+    mutationFn: (newUser) => 
+      axios.post("http://localhost:5001/api/users", newUser, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
