@@ -12,9 +12,16 @@ app.use(cors());  // Enable CORS for all routes
 app.use(express.json());  // Parse JSON bodies
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cardioguard', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+mongoose.connect(process.env.MONGODB_URI, {
+    serverApi: {
+        version: '1',
+        strict: true,
+        deprecationErrors: true,
+    }
+}).then(() => {
+    console.log("Connected to MongoDB successfully");
+}).catch((err) => {
+    console.error("MongoDB connection error:", err);
 });
 
 // Check database connection
@@ -62,16 +69,15 @@ app.post('/api/users', async (req, res) => {
 });
 
 // Add health metrics to existing user
-app.post('/api/users/:id/health-metrics', async (req, res) => {
+app.post('/api/users', async (req, res) => {
+    console.log('Received request body:', req.body); // Add this line
     try {
-        const user = await User.findById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        user.healthMetrics.push(req.body);
+        const user = new User(req.body);
         await user.save();
+        console.log('User saved successfully:', user); // Add this line
         res.status(201).json(user);
     } catch (error) {
+        console.error('Error saving user:', error); // Add this line
         res.status(400).json({ error: error.message });
     }
 });
@@ -90,7 +96,8 @@ app.get('/api/users/:id', async (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
+// At the bottom of server.js
+const PORT = 5001; // Change this line to explicitly use 5001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
